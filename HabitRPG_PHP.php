@@ -1,8 +1,8 @@
 <?php
 	/*
-	 * @author Rex Finn <rexcfinn@gmail.com>
+	 * @author Rudd Fawcett <rudd.fawcett@gmail.com>
 	 * @version 1.4
-	 * @link http://github.com/rexfinn/HabitRPG_PHP
+	 * @link http://github.com/ruddfawcett/HabitRPG_PHP
 	 * @package HabitRPG_PHP
 	 */
 
