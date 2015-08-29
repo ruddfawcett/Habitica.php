@@ -1,43 +1,43 @@
 <?php
 	/*
-	 * @author Rudd Fawcett <rudd.fawcett@gmail.com>
-	 * @version 1.4
-	 * @link http://github.com/ruddfawcett/HabitRPG_PHP
-	 * @package HabitRPG_PHP
+     * ORIGINAL AUTHOR: RUDD FAWCETT
+     * MODIFIED BY: DARIUS LAM
+     * COMPATIBLE WITH HABITICA API V2
 	 */
 
-class HabitRPG {
+class Habitica{
 	public $userId;
 	public $apiToken;
 	public $apiURL;
 	
 	/**
-	 * Creates a new HabitRPG instance
+	 * Creates a new Habitica instance
 	 */
 	 
-	public function __construct ($userId, $apiToken) {
+	public function __construct ($userId,$apiToken) {
 
 		$this->userId = $userId;
 		$this->apiToken = $apiToken;
-		$this->apiURL = "https://habitrpg.com/api/v1/user";
+		$this->apiURL = "https://habitica.com/api/v2/user";
 		
 		if(!extension_loaded("cURL")) {
-			throw new Exception("This HabitRPG PHP API class requires cURL in order to work.");
+			throw new Exception("This Habitica PHP API class requires cURL in order to work.");
 		}
 	}
 	
 	/**
 	 * Creates a new task for the userId and apiToken HabitRPG is initiated with
-	 * @param array $newTaskParams required keys: type, title and text
-	 * @param array $newTaskParams optional keys: value and note
+	 * @param array $newTaskParams required keys: type and text (title)
+	 * @param array $newTaskParams optional keys: value, note
 	 */
 	
 	public function newTask($newTaskParams) {
 		if(is_array($newTaskParams)) {
-			if(!empty($newTaskParams['type']) && !empty($newTaskParams['title']) && !empty($newTaskParams['text'])) {
-				$newTaskParamsEndpoint=$this->apiURL."/task";
+			if(!empty($newTaskParams['type']) && !empty($newTaskParams['text'])) {
+				$newTaskParamsEndpoint=$this->apiURL."/tasks";
 				$newTaskPostBody=array();
 				$newTaskPostBody['type'] = $newTaskParams['type'];
+                $newTaskPostBody['text'] = $newTaskParams['text'];
 				if(!empty($newTaskParams['value'])) {
 					$newTaskPostBody['value']=$newTaskParams['value'];
 				}
@@ -58,16 +58,31 @@ class HabitRPG {
 		}
 	}
 	
+    /**
+     * Returns a task's id using it's title/text
+     * @param string $taskName   
+     */
+    
+    public function getTaskId($taskName){
+        $all_tasks = $this->userTasks()['habitRPGData'];
+        foreach($all_tasks as $task){
+            if($task['text'] == $taskName){
+                return $task['id'];
+            }
+        }
+        return 'No task found with that name';
+    }
+    
 	/**
 	 * Up votes or down votes a task by taskId using apiToken and userId
-	 * @param array $scoringParams required keys: taskId and direction
+	 * @param array $scoringParams required keys: taskId and direction ('up' or 'down')
 	 * @param array $scoringParams optional keys: title, service and icon
 	 */
 	
 	public function taskScoring($scoringParams) {
 		if(is_array($scoringParams)) {
 			if(!empty($scoringParams['taskId']) && !empty($scoringParams['direction'])) {
-				$scoringEndpoint="https://habitrpg.com/v1/users/".$this->userId."/tasks/".$scoringParams['taskId']."/".$scoringParams['direction'];
+				$scoringEndpoint="https://habitica.com/api/v2/user/tasks/".$scoringParams['taskId']."/".$scoringParams['direction'];
 				$scoringPostBody=array();
 				$scoringPostBody['apiToken']=$this->apiToken;
 				if(!empty($scoringParams['title'])) {
@@ -123,7 +138,7 @@ class HabitRPG {
 	
 	public function userGetTask($taskId) {
 		if(!empty($taskId)) {
-			$userGetTaskEndpoint=$this->apiURL."/task/".$taskId;
+			$userGetTaskEndpoint=$this->apiURL."/tasks/".$taskId;
 			
 			return $this->curl($userGetTaskEndpoint,"GET");
 		}
@@ -140,7 +155,7 @@ class HabitRPG {
 	public function updateTask($updateParams) {
 		if(is_array($updateParams)) {
 			if(!empty($updateParams['taskId']) && !empty($updateParams['text'])) {
-				$updateParamsEndpoint=$this->apiURL."/task/".$updateParams['taskId'];
+				$updateParamsEndpoint=$this->apiURL."/tasks/".$updateParams['taskId'];
 				$updateTaskPostBody=array();
 				$updateTaskPostBody['text'] = $updateParams['text'];
 				
@@ -169,7 +184,7 @@ class HabitRPG {
 		$curlArray = array(
 							CURLOPT_RETURNTRANSFER => true, 
 							CURLOPT_HEADER => false, 
-							CURLOPT_ENCODING => "gzip",
+							//CURLOPT_ENCODING => "gzip",
 							CURLOPT_HTTPHEADER => array(
 														"Content-type: application/json",
 														"x-api-user:".$this->userId,
