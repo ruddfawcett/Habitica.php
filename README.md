@@ -1,42 +1,27 @@
-#HabitRPG_PHP
-A PHP class for the HabitRPG API
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ruddfawcett/HabitRPG_PHP/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+#Habitica PHP
+A PHP class for the new Habitica API V2
 
 ##Supported Functions
 
 ### GET
-* /api/v1/user - (get user status)
-    * `x-api-user: uid`
-    * `x-api-key: api token`
-* /api/v1/user/tasks
-    * `x-api-user: uid`
-    * `x-api-key: api token`
-    * `type: habit | daily | todo | reward` (optional)
-* /api/v1/user/task/:id - (get task)
-    * `x-api-user: uid`
-    * `x-api-key: api token`
+* User status
+* User tasks
+* Task id by task name/text
+* Task information by task id
 
 ### POST
-* /api/v1/user/task - (create new task)
-    * `x-api-user: uid`
-    * `x-api-key: api token`
-    * `type: habit | daily | todo | reward` (required)
-    * `text: This is an example title` (required)
-    * `completed: false`
-    * `value: 0`
-    * `note: This is just a simple note`
-
+* Create New Tasks
+    * `type: habit | daily | todo | reward`
+    * `text: This is an example title` 
+    * `value: 0` 
+    * `note: This is just a simple note` 
+* Score Tasks
+    * `taskId: some-task-id`
+    * `direction: up | down`
+* Update Tasks
+    * `taskId: some-task-id`
+    * `text: Updated title`
+    
 ### PUT
-* /api/v1/user/task/:id - (update task)
-    * update text
-    * `x-api-user: uid`
-    * `x-api-key: api token`
-
-##Future Functions
-
-- Whichever API methods become available to HabitRPG!
-
-##Links
-
-Link to [HabitRPG](https://habitrpg.com).  Link to it's awesome [Kickstarter](https://www.kickstarter.com/projects/lefnire/habitrpg-mobile) (which you should totally pledge to).  Link to the [source] (https://github.com/lefnire/habitrpg).
+* Update Tasks
+    * 'text: Updated title' (required)
