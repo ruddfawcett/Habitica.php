@@ -1,8 +1,8 @@
 <?php
 	/*
      * ORIGINAL AUTHOR: RUDD FAWCETT
-     * MODIFIED BY: DARIUS LAM
-     * COMPATIBLE WITH HABITICA API V2
+     * MODIFIED BY: DARIUS LAM, JOEL HATCH
+     * COMPATIBLE WITH HABITICA API V3
 	 */
 
 class Habitica{
@@ -18,7 +18,7 @@ class Habitica{
 
 		$this->userId = $userId;
 		$this->apiToken = $apiToken;
-		$this->apiURL = "https://habitica.com/api/v2/user";
+		$this->apiURL = "https://habitica.com/api/v3";
 		
 		if(!extension_loaded("cURL")) {
 			throw new Exception("This Habitica PHP API class requires cURL in order to work.");
@@ -34,7 +34,7 @@ class Habitica{
 	public function newTask($newTaskParams) {
 		if(is_array($newTaskParams)) {
 			if(!empty($newTaskParams['type']) && !empty($newTaskParams['text'])) {
-				$newTaskParamsEndpoint=$this->apiURL."/tasks";
+				$newTaskParamsEndpoint=$this->apiURL."/tasks/user";
 				$newTaskPostBody=array();
 				$newTaskPostBody['type'] = $newTaskParams['type'];
                 $newTaskPostBody['text'] = $newTaskParams['text'];
@@ -64,7 +64,7 @@ class Habitica{
      */
     
     public function getTaskId($taskName){
-        $all_tasks = $this->userTasks()['habitRPGData'];
+        $all_tasks = $this->userTasks()['habitRPGData']['data'];
         foreach($all_tasks as $task){
             if($task['text'] == $taskName){
                 return $task['id'];
@@ -82,7 +82,7 @@ class Habitica{
 	public function taskScoring($scoringParams) {
 		if(is_array($scoringParams)) {
 			if(!empty($scoringParams['taskId']) && !empty($scoringParams['direction'])) {
-				$scoringEndpoint="https://habitica.com/api/v2/user/tasks/".$scoringParams['taskId']."/".$scoringParams['direction'];
+                $scoringEndpoint=$this->apiURL."/tasks/".$scoringParams['taskId']."/score/".$scoringParams['direction'];
 				$scoringPostBody=array();
 				$scoringPostBody['apiToken']=$this->apiToken;
 				if(!empty($scoringParams['title'])) {
@@ -114,7 +114,7 @@ class Habitica{
 	 */
 	
 	public function userStats() {
-		return $this->curl($this->apiURL,"GET",NULL);
+		return $this->curl($this->apiURL.'/user',"GET",NULL);
 	}
 	
 	/**
@@ -124,7 +124,7 @@ class Habitica{
 	 */
 	
 	public function userTasks($userTasksType=NULL) {
-		$userTasksEndpoint=$this->apiURL."/tasks";
+		$userTasksEndpoint=$this->apiURL."/tasks/user";
 		if($userTasksType != NULL) {
 			$userTasksEndpoint=$this->apiURL."/tasks?type=".$userTasksType;
 		}
@@ -140,7 +140,7 @@ class Habitica{
 		if(!empty($taskId)) {
 			$userGetTaskEndpoint=$this->apiURL."/tasks/".$taskId;
 			
-			return $this->curl($userGetTaskEndpoint,"GET");
+			return $this->curl($userGetTaskEndpoint,"GET",NULL);
 		}
 		else {
 			throw new Exception("userGetTask needs a value as it's parameter.");
@@ -215,7 +215,7 @@ class Habitica{
 		
 		curl_close($curl);
 		
-		if ($habitRPGHTTPCode == 200) {
+		if ($habitRPGHTTPCode >= 200 && $habitRPGHTTPCode < 300) {
 			return array("result"=>true,"habitRPGData"=>json_decode($habitRPGResponse,true));
 		}
 		else {
